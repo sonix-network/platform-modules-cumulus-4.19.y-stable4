@@ -1,0 +1,136 @@
+#
+# This Makefile executes the unpack/build/binary targets for a single
+# subarch, which is passed in the subarch variable. Empty subarch
+# variable means that we are building for an arch without the subarch.
+# Additionally, variables version, abiname and ltver are
+# expected to be available (need to be exported from the parent process).
+#
+SHELL  := bash -e
+ifdef ARCH
+DEB_HOST_ARCH     := $(shell dpkg-architecture -a'$(ARCH)' -qDEB_HOST_ARCH)
+DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -a'$(ARCH)' -qDEB_HOST_GNU_TYPE)
+DEB_HOST_MULTIARCH:= $(shell dpkg-architecture -a'$(ARCH)' -qDEB_HOST_MULTIARCH)
+DEB_BUILD_ARCH    := $(shell dpkg-architecture -a'$(ARCH)' -qDEB_BUILD_ARCH)
+endif
+MAINTAINER := $(shell sed -ne 's,^Maintainer: .[^<]*<\([^>]*\)>,\1,p' debian/control)
+SOURCE_PACKAGE_NAME := $(shell dpkg-parsechangelog -SSource)
+DISTRIBUTION := $(shell dpkg-parsechangelog -SDistribution)
+SOURCE_DATE := $(shell dpkg-parsechangelog -SDate)
+SOURCE_DATE_UTC_ISO := $(shell date -u -d '$(SOURCE_DATE)' +%Y-%m-%d)
+
+DISTRIBUTOR := $(shell lsb_release -is 2>/dev/null)
+ifeq ($(DISTRIBUTOR),)
+DISTRIBUTOR := Cumulus
+endif
+
+ifdef OVERRIDE_HOST_TYPE
+  CROSS_COMPILE := $(OVERRIDE_HOST_TYPE)-
+else ifneq ($(DEB_BUILD_ARCH),$(DEB_HOST_ARCH))
+  CROSS_COMPILE := $(DEB_HOST_GNU_TYPE)-
+else
+  CROSS_COMPILE :=
+endif
+
+export DH_OPTIONS
+export DEB_HOST_ARCH DEB_HOST_GNU_TYPE DEB_BUILD_ARCH
+export LC_ALL = C.UTF-8
+
+include debian/rules.defs
+
+stamp = [ -d $(dir $@) ] || mkdir $(dir $@); touch $@
+
+setup_env := env -u ABINAME -u FEATURESET -u FLAVOUR -u VERSION -u LOCALVERSION
+setup_env += DISTRIBUTION_OFFICIAL_BUILD=1 DISTRIBUTOR="$(DISTRIBUTOR)" DISTRIBUTION_VERSION="$(SOURCEVERSION)" KBUILD_BUILD_TIMESTAMP="$(SOURCE_DATE)" KBUILD_BUILD_VERSION_TIMESTAMP="$(DISTRIBUTOR) $(SOURCEVERSION) ($(SOURCE_DATE_UTC_ISO))" KBUILD_BUILD_USER="$(word 1,$(subst @, ,$(MAINTAINER)))" KBUILD_BUILD_HOST="$(word 2,$(subst @, ,$(MAINTAINER)))" DEBARCH="$(ARCH)" ARCH="$(KERNEL_ARCH)" CROSS_COMPILE="$(CROSS_COMPILE)" KCFLAGS="$(CFLAGS_KERNEL)"
+
+MAKE_CLEAN = $(setup_env) $(MAKE)
+MAKE_SELF := $(MAKE) -f debian/rules.real $(MAKEOVERRIDES)
+MAKEOVERRIDES =
+
+define copy_source
+mkdir -p '$(1)'
+cp -al $(filter-out debian .pc .svk .svn .git, $(wildcard * .[^.]*)) '$(1)'
+endef
+
+#
+# Targets
+#
+binary-arch-flavour: install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE)
+ifeq ($(DEBUG),True)
+  binary-arch-flavour: install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+endif
+
+build-arch: $(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE)
+
+setup-flavour: $(STAMPS_DIR)/setup_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+
+$(STAMPS_DIR)/setup_$(ARCH)_$(FEATURESET)_$(FLAVOUR): DIR=$(BUILD_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+$(STAMPS_DIR)/setup_$(ARCH)_$(FEATURESET)_$(FLAVOUR):
+	rm -rf '$(DIR)'
+	$(call copy_source,$(DIR))
+	( cd $(DIR); \
+		$(MAKE_CLEAN) -f Makefile -C $(if $(KSRC),$(KSRC)/debian/build/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR),/lib/modules/$(ABINAME)$(LOCALVERSION)/build) M=$$(pwd) clean )
+	@$(stamp)
+
+$(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): DIR=$(BUILD_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+$(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): $(STAMPS_DIR)/setup_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+
+$(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_plain:
+	+( cd $(DIR); \
+		$(MAKE_CLEAN) -f Makefile -C $(if $(KSRC),$(KSRC)/debian/build/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR),/lib/modules/$(ABINAME)$(LOCALVERSION)/build) M=$$(pwd) )
+	@$(stamp)
+
+install-base:
+	dh_installdocs $(INSTALLDOCS_ARGS)
+	dh_installchangelogs
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- $(GENCONTROL_ARGS)
+	dh_md5sums
+	dh_builddeb -- -Zxz $(BUILDDEB_ARGS)
+
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): REAL_VERSION = $(ABINAME)$(LOCALVERSION)
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): PACKAGE_NAME = platform-modules-$(REAL_VERSION)
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): PACKAGE_DIR = debian/$(PACKAGE_NAME)
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): INSTALL_DIR = $(PACKAGE_DIR)/lib/modules/$(REAL_VERSION)/extra
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): DIR = $(BUILD_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): DH_OPTIONS = -p$(PACKAGE_NAME)
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE): $(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE)
+
+install-modules_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_plain:
+	dh_testdir
+	dh_testroot
+	dh_prep
+	+( cd '$(DIR)'; \
+		$(MAKE_CLEAN) -f Makefile -C $(if $(KSRC),$(KSRC)/debian/build/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR),/lib/modules/$(ABINAME)$(LOCALVERSION)/build) M=$$(pwd) modules_install DEPMOD='$(CURDIR)/debian/bin/no-depmod' INSTALL_MOD_PATH='$(CURDIR)/$(PACKAGE_DIR)' INSTALL_MOD_STRIP=1 )
+ifeq ($(DEBUG),True)
+	set -o pipefail; \
+	find $(PACKAGE_DIR) -name '*.ko' | sed 's|$(INSTALL_DIR)/||' | while read module ; do \
+	  $(CROSS_COMPILE)objcopy --add-gnu-debuglink=$(DIR)/$$module $(INSTALL_DIR)/$$module || exit; \
+	done
+endif
+	rm -f $(PACKAGE_DIR)/lib/modules/$(REAL_VERSION)/build
+	rm -f $(PACKAGE_DIR)/lib/modules/$(REAL_VERSION)/source
+	dh_installdebconf
+	+$(MAKE_SELF) install-base GENCONTROL_ARGS='$(GENCONTROL_ARGS)'
+
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): REAL_VERSION = $(ABINAME)$(LOCALVERSION)
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): PACKAGE_NAME = platform-modules-$(REAL_VERSION)-dbg
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): PACKAGE_DIR = debian/$(PACKAGE_NAME)
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): DEBUG_DIR = $(PACKAGE_DIR)/usr/lib/debug
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): DIR = $(BUILD_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): DH_OPTIONS = -p$(PACKAGE_NAME)
+install-modules-dbg_$(ARCH)_$(FEATURESET)_$(FLAVOUR): $(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)_$(TYPE)
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs usr/lib/debug usr/share/lintian/overrides/
+	dh_lintian
+	+( cd '$(DIR)'; \
+		$(MAKE_CLEAN) -f Makefile -C $(if $(KSRC),$(KSRC)/debian/build/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR),/lib/modules/$(ABINAME)$(LOCALVERSION)/build) M=$$(pwd) modules_install DEPMOD='$(CURDIR)/debian/bin/no-depmod' INSTALL_MOD_PATH='$(CURDIR)/$(DEBUG_DIR)')
+	rm $(DEBUG_DIR)/lib/firmware -rf
+# Add symlinks to vmlinux from the locations expected by kdump-tools,
+# systemtap and others
+	mkdir -p $(DEBUG_DIR)/lib/modules/$(REAL_VERSION)
+	+$(MAKE_SELF) install-base

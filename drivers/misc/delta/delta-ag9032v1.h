@@ -1,0 +1,341 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Delta AG9032v1 CPLD Definitions
+ *
+ * Copyright (C) 2016, 2017, 2019 Cumulus Networks, Inc.  All Rights Reserved.
+ * Author: Alan Liebthal (alanl@cumulusnetworks.com)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * GNU General Public License for more details.
+ */
+
+#ifndef DELTA_AG9032V1_CPLD_H__
+#define DELTA_AG9032V1_CPLD_H__
+
+/*------------------------------------------------------------------------------
+ *
+ * This platform has two CPLD devices
+ *
+ *------------------------------------------------------------------------------
+ */
+
+#define AG9032V1_PLATFORM_NAME "ag9032v1_platform"
+#define AG9032V1_CPUPLD_NAME   "ag9032v1_cpupld"
+#define AG9032V1_SWCPLD_NAME   "ag9032v1_swcpld"
+#define AG9032V1_SFFMUX_NAME   "ag9032v1_sffmux"
+#define AG9032V1_FANMUX_NAME   "ag9032v1_fanmux"
+#define AG9032V1_PSUMUX_NAME   "ag9032v1_psumux"
+
+/*------------------------------------------------------------------------------
+ *
+ * This platform has two i2c busses:
+ *  SMBus_0: SMBus I801 adapter at PCIe address 0000:00:1f.3
+ *  SMBus_1: SMBus iSMT adapter at PCIe address 0000:00:13.0
+ *
+ *------------------------------------------------------------------------------
+ */
+
+enum {
+	I2C_ISMT_BUS = 0,
+	I2C_I801_BUS,
+	I2C_MUX1_BUS0 = 10,
+	I2C_MUX1_BUS1,
+	I2C_MUX1_BUS2,
+	I2C_MUX1_BUS3,
+	I2C_MUX1_BUS4,
+	I2C_MUX1_BUS5,
+	I2C_MUX1_BUS6,
+	I2C_MUX1_BUS7,
+	CPLD_FAN_MUX_BUS0 = 20,
+	CPLD_FAN_MUX_BUS1,
+	CPLD_FAN_MUX_BUS2,
+	CPLD_FAN_MUX_BUS3,
+	CPLD_FAN_MUX_BUS4,
+	CPLD_FAN_MUX_BUS5,
+	CPLD_FAN_MUX_BUS6,
+	CPLD_FAN_MUX_BUS7,
+	CPLD_PSU_MUX_BUS0 = 30,
+	CPLD_PSU_MUX_BUS1,
+	CPLD_PSU_MUX_BUS2,
+	CPLD_PSU_MUX_BUS3,
+	CPLD_QSFP_MUX_BUS0 = 41,
+	CPLD_QSFP_MUX_BUS1,
+	CPLD_QSFP_MUX_BUS2,
+	CPLD_QSFP_MUX_BUS3,
+	CPLD_QSFP_MUX_BUS4,
+	CPLD_QSFP_MUX_BUS5,
+	CPLD_QSFP_MUX_BUS6,
+	CPLD_QSFP_MUX_BUS7,
+	CPLD_QSFP_MUX_BUS8,
+	CPLD_QSFP_MUX_BUS9,
+	CPLD_QSFP_MUX_BUS10,
+	CPLD_QSFP_MUX_BUS11,
+	CPLD_QSFP_MUX_BUS12,
+	CPLD_QSFP_MUX_BUS13,
+	CPLD_QSFP_MUX_BUS14,
+	CPLD_QSFP_MUX_BUS15,
+	CPLD_QSFP_MUX_BUS16,
+	CPLD_QSFP_MUX_BUS17,
+	CPLD_QSFP_MUX_BUS18,
+	CPLD_QSFP_MUX_BUS19,
+	CPLD_QSFP_MUX_BUS20,
+	CPLD_QSFP_MUX_BUS21,
+	CPLD_QSFP_MUX_BUS22,
+	CPLD_QSFP_MUX_BUS23,
+	CPLD_QSFP_MUX_BUS24,
+	CPLD_QSFP_MUX_BUS25,
+	CPLD_QSFP_MUX_BUS26,
+	CPLD_QSFP_MUX_BUS27,
+	CPLD_QSFP_MUX_BUS28,
+	CPLD_QSFP_MUX_BUS29,
+	CPLD_QSFP_MUX_BUS30,
+	CPLD_QSFP_MUX_BUS31,
+};
+
+/*------------------------------------------------------------------------------
+ *
+ *			       Struct for CPLD mux control
+ *
+ *------------------------------------------------------------------------------
+ */
+
+struct cpld_item {
+	struct i2c_client *cpld_client;
+	struct mutex cpld_mutex; /* mutex for fanmux and psumux select */
+};
+
+/*------------------------------------------------------------------------------
+ *
+ *			       CPU CPLD Registers
+ *
+ *------------------------------------------------------------------------------
+ */
+
+#define DELTA_AG9032V1_CPUPLD_VERSION_REG				 0x01
+#  define DELTA_AG9032V1_CPUPLD_REV_MSB					 7
+#  define DELTA_AG9032V1_CPUPLD_REV_LSB					 0
+
+#define DELTA_AG9032V1_CPUPLD_BOARD_ID_REG				 0x02
+#  define DELTA_AG9032V1_CPUPLD_BOARD_VERSION_MSB			 7
+#  define DELTA_AG9032V1_CPUPLD_BOARD_VERSION_LSB			 4
+#  define DELTA_AG9032V1_CPUPLD_BOARD_ID_MSB				 3
+#  define DELTA_AG9032V1_CPUPLD_BOARD_ID_LSB				 0
+
+#define DELTA_AG9032V1_CPUPLD_MAIN_BOARD_TYPE_REG			 0x03
+
+#define DELTA_AG9032V1_CPUPLD_MAIN_BOARD_REV_REG			 0x04
+
+#define DELTA_AG9032V1_CPUPLD_SW_RESET_1_REG				 0x05
+#  define DELTA_AG9032V1_FORCE_RESET_BIT				 7
+#  define DELTA_AG9032V1_MB_RST_N_BIT					 1
+#  define DELTA_AG9032V1_I2C_SW_RST_BIT					 0
+
+#define DELTA_AG9032V1_CPUPLD_SW_RESET_2_REG				 0x06
+#  define DELTA_AG9032V1_RESET_REQ_BIT					 3
+
+#define DELTA_AG9032V1_CPUPLD_POWER_STATUS_CONTROL_1_REG		 0x07
+#  define DELTA_AG9032V1_PG_3V3_BIT					 7
+#  define DELTA_AG9032V1_PG_1V1_BIT					 6
+#  define DELTA_AG9032V1_PGD_DDR_VTT_BIT				 5
+#  define DELTA_AG9032V1_VR_PVDDR_A_PWRGD_BIT				 4
+#  define DELTA_AG9032V1_PWRGD_PVCCP_PVNN_BIT				 3
+#  define DELTA_AG9032V1_V1P0_PG_BIT					 2
+#  define DELTA_AG9032V1_PG_5VA_BIT					 1
+#  define DELTA_AG9032V1_PG_3V3A_BIT					 0
+
+#define DELTA_AG9032V1_CPUPLD_POWER_STATUS_CONTROL_2_REG		 0x08
+#  define DELTA_AG9032V1_MB_PWR_PGD_BIT					 4
+#  define DELTA_AG9032V1_REG_1V8_PG_BIT					 1
+#  define DELTA_AG9032V1_REG_1V35_PG_BIT				 0
+
+#define DELTA_AG9032V1_CPUPLD_POWER_STATUS_CONTROL_3_REG		 0x09
+
+#define DELTA_AG9032V1_CPUPLD_INTERRUPT_1_REG				 0x0a
+#  define DELTA_AG9032V1_IRQ_PHY_BIT					 2
+#  define DELTA_AG9032V1_OP_MODULE_EVENT_N_BIT				 1
+#  define DELTA_AG9032V1_PSU_FAN_EVENT_N_BIT				 0
+
+#define DELTA_AG9032V1_CPUPLD_INTERRUPT_2_REG				 0x0b
+
+#define DELTA_AG9032V1_CPUPLD_INTERRUPT_3_REG				 0x0c
+
+#define DELTA_AG9032V1_CPUPLD_FLASH_PROTECTION_1_REG			 0x10
+#  define DELTA_AG9032V1_SPI_WP_GBE_N_BIT				 3
+#  define DELTA_AG9032V1_EEPROM_WP_BIT					 2
+
+#define DELTA_AG9032V1_CPUPLD_FLASH_PROTECTION_2_REG			 0x13
+#  define DELTA_AG9032V1_CPLD_MUX_R_BIT					 0
+
+/*------------------------------------------------------------------------------
+ *
+ *			       SW CPLD Registers
+ *
+ *------------------------------------------------------------------------------
+ */
+
+#define DELTA_AG9032V1_SWCPLD_BOARD_ID_REG				 0x00
+#  define DELTA_AG9032V1_SWCPLD_BOARD_ID_MSB				 7
+#  define DELTA_AG9032V1_SWCPLD_BOARD_ID_LSB				 4
+#  define DELTA_AG9032V1_SWCPLD_BOARD_VERSION_MSB			 3
+#  define DELTA_AG9032V1_SWCPLD_BOARD_VERSION_LSB			 0
+
+#define DELTA_AG9032V1_SWCPLD_VERSION_REG				 0x01
+#  define DELTA_AG9032V1_SWITCH_CPLD_VERSION_MSB			 7
+#  define DELTA_AG9032V1_SWITCH_CPLD_VERSION_LSB			 0
+
+#define DELTA_AG9032V1_SWCPLD_SOFTWARE_RESET_1_REG		         0x04
+#  define DELTA_AG9032V1_SW_RST_BIT					 7
+#  define DELTA_AG9032V1_RESET_N_B56960_BIT				 6
+#  define DELTA_AG9032V1_RESET_N_B54616S_BIT				 5
+#  define DELTA_AG9032V1_MB_A_CPLD_RESET_N_BIT				 4
+#  define DELTA_AG9032V1_MB_B_CPLD_RESET_N_BIT				 3
+
+#define DELTA_AG9032V1_SWCPLD_POWER_STATUS_CONTROL_1_REG		 0x08
+#  define DELTA_AG9032V1_PS1_PSON_N_BIT					 7
+#  define DELTA_AG9032V1_PS2_PSON_N_BIT					 6
+#  define DELTA_AG9032V1_HOTSWAP1_EN_N_BIT				 5
+#  define DELTA_AG9032V1_HOTSWAP2_EN_N_BIT				 4
+#  define DELTA_AG9032V1_VCC_5V_EN_BIT					 3
+#  define DELTA_AG9032V1_MAC_1V8_EN_BIT					 2
+#  define DELTA_AG9032V1_MAC_1V25_EN_BIT				 1
+#  define DELTA_AG9032V1_MAC_AVS_1V_EN_BIT				 0
+
+#define DELTA_AG9032V1_SWCPLD_POWER_STATUS_CONTROL_2_REG		 0x09
+#  define DELTA_AG9032V1_MAC_1V_EN_BIT					 7
+
+#define DELTA_AG9032V1_SWCPLD_POWER_STATUS_CONTROL_3_REG		 0x0a
+#  define DELTA_AG9032V1_PS1_PWR_FAN_OK_BIT				 7
+#  define DELTA_AG9032V1_PS2_PWR_FAN_OK_BIT				 6
+#  define DELTA_AG9032V1_HOT_SWAP_PG1_BIT				 5
+#  define DELTA_AG9032V1_HOT_SWAP_PG2_BIT				 4
+#  define DELTA_AG9032V1_VCC_5V_PG_BIT					 3
+#  define DELTA_AG9032V1_MAC_1V8_PG_BIT					 2
+#  define DELTA_AG9032V1_VCC_MAC_1V25_PG_BIT				 1
+#  define DELTA_AG9032V1_MAC_AVS_1V_PG_BIT				 0
+
+#define DELTA_AG9032V1_SWCPLD_POWER_STATUS_CONTROL_4_REG		 0x0b
+#  define DELTA_AG9032V1_MAC_1V_PG_BIT					 7
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_0_REG				 0x10
+#  define DELTA_AG9032V1_HOT_SWAP_INT1_BIT				 7
+#  define DELTA_AG9032V1_HOT_SWAP_INT2_BIT				 6
+#  define DELTA_AG9032V1_PS1_PWR_INT_N_BIT				 5
+#  define DELTA_AG9032V1_PS2_PWR_INT_N_BIT				 4
+#  define DELTA_AG9032V1_FAN_ALERT_N_BIT				 3
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_MASK_0_REG			 0x11
+#  define DELTA_AG9032V1_HOT_SWAP_INT1_MASK_BIT				 7
+#  define DELTA_AG9032V1_HOT_SWAP_INT2_MASK_BIT				 6
+#  define DELTA_AG9032V1_PS1_PWR_INT_N_MASK_BIT				 5
+#  define DELTA_AG9032V1_PS2_PWR_INT_N_MASK_BIT				 4
+#  define DELTA_AG9032V1_FAN_ALERT_N_MASK_BIT				 3
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_1_REG				 0x12
+#  define DELTA_AG9032V1_QSFP_1_8_INT_N_BIT				 7
+#  define DELTA_AG9032V1_QSFP_9_16_INT_N_BIT				 6
+#  define DELTA_AG9032V1_QSFP_17_24_INT_N_BIT				 5
+#  define DELTA_AG9032V1_QSFP_25_32_INT_N_BIT				 4
+#  define DELTA_AG9032V1_QSFP_1_8_ABS_N_BIT				 3
+#  define DELTA_AG9032V1_QSFP_9_16_ABS_N_BIT				 2
+#  define DELTA_AG9032V1_QSFP_17_24_ABS_N_BIT				 1
+#  define DELTA_AG9032V1_QSFP_25_32_ABS_N_BIT				 0
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_MASK_1_REG			 0x13
+#  define DELTA_AG9032V1_QSFP_1_8_INT_N_MASK_BIT			 7
+#  define DELTA_AG9032V1_QSFP_9_16_INT_N_MASK_BIT			 6
+#  define DELTA_AG9032V1_QSFP_17_24_INT_N_MASK_BIT			 5
+#  define DELTA_AG9032V1_QSFP_25_32_INT_N_MASK_BIT			 4
+#  define DELTA_AG9032V1_QSFP_1_8_ABS_N_MASK_BIT			 3
+#  define DELTA_AG9032V1_QSFP_9_16_ABS_N_MASK_BIT			 2
+#  define DELTA_AG9032V1_QSFP_17_24_ABS_N_MASK_BIT			 1
+#  define DELTA_AG9032V1_QSFP_25_32_ABS_N_MASK_BIT			 0
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_3_REG				 0x16
+#  define DELTA_AG9032V1_BCM54616S_IRQ_N_BIT				 7
+
+#define DELTA_AG9032V1_SWCPLD_INTERRUPT_MASK_3_REG			 0x17
+#  define DELTA_AG9032V1_BCM54616S_IRQ_N_MASK_BIT			 7
+
+#define DELTA_AG9032V1_SWCPLD_SYSTEM_LED_REG				 0x1c
+#  define DELTA_AG9032V1_PSU1_LED_MSB					 7
+#  define DELTA_AG9032V1_PSU1_LED_LSB					 6
+#  define DELTA_AG9032V1_PSU2_LED_MSB					 5
+#  define DELTA_AG9032V1_PSU2_LED_LSB					 4
+#  define DELTA_AG9032V1_SYS_LED_MSB					 3
+#  define DELTA_AG9032V1_SYS_LED_LSB					 2
+#  define DELTA_AG9032V1_FAN_LED_MSB					 1
+#  define DELTA_AG9032V1_FAN_LED_LSB					 0
+
+#define DELTA_AG9032V1_SWCPLD_FAN_TRAY_LED_1_REG			 0x1d
+#  define DELTA_AG9032V1_FAN1_LED_MSB					 7
+#  define DELTA_AG9032V1_FAN1_LED_LSB					 6
+#  define DELTA_AG9032V1_FAN2_LED_MSB					 5
+#  define DELTA_AG9032V1_FAN2_LED_LSB					 4
+#  define DELTA_AG9032V1_FAN3_LED_MSB					 3
+#  define DELTA_AG9032V1_FAN3_LED_LSB					 2
+#  define DELTA_AG9032V1_FAN4_LED_MSB					 1
+#  define DELTA_AG9032V1_FAN4_LED_LSB					 0
+
+#define DELTA_AG9032V1_SWCPLD_FAN_TRAY_LED_2_REG			 0x1e
+#  define DELTA_AG9032V1_FAN5_LED_MSB					 7
+#  define DELTA_AG9032V1_FAN5_LED_LSB					 6
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_I2C_MUX_REG			 0x20
+#  define DELTA_AG9032V1_CAGE_I2C_SEL_MSB				 7
+#  define DELTA_AG9032V1_CAGE_I2C_SEL_LSB				 0
+
+#define DELTA_AG9032V1_SWCPLD_PSU_AND_FAN_I2C_MUX_REG			 0x21
+#  define DELTA_AG9032V1_PSU_I2C_SEL_MSB				 5
+#  define DELTA_AG9032V1_PSU_I2C_SEL_LSB				 4
+#  define DELTA_AG9032V1_FAN_I2C_SEL_MSB				 2
+#  define DELTA_AG9032V1_FAN_I2C_SEL_LSB				 0
+
+/* This is the number of registers in each each block */
+#define NUM_QSFP_REGS							 4
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MODSEL_1_REG			 0x30
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MODSEL_2_REG			 0x31
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MODSEL_3_REG			 0x32
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MODSEL_4_REG			 0x33
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_LPMODE_EN_1_REG			 0x34
+#define DELTA_AG9032V1_SWCPLD_QSFP28_LPMODE_EN_2_REG			 0x35
+#define DELTA_AG9032V1_SWCPLD_QSFP28_LPMODE_EN_3_REG			 0x36
+#define DELTA_AG9032V1_SWCPLD_QSFP28_LPMODE_EN_4_REG			 0x37
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_ABS_1_REG			 0x38
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_ABS_2_REG			 0x39
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_ABS_3_REG			 0x3a
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_ABS_4_REG			 0x3b
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_RST_N_1_REG			 0x3c
+#define DELTA_AG9032V1_SWCPLD_QSFP28_RST_N_2_REG			 0x3d
+#define DELTA_AG9032V1_SWCPLD_QSFP28_RST_N_3_REG			 0x3e
+#define DELTA_AG9032V1_SWCPLD_QSFP28_RST_N_4_REG			 0x3f
+
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_INT_N_1_REG			 0x40
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_INT_N_2_REG			 0x41
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_INT_N_3_REG			 0x42
+#define DELTA_AG9032V1_SWCPLD_QSFP28_MOD_INT_N_4_REG			 0x43
+
+/*------------------------------------------------------------------------------
+ *
+ *			       GPIO Pins
+ *
+ *------------------------------------------------------------------------------
+ */
+
+#define DELTA_AG9032V1_GPIO_FAN5_ABSENT					 0
+#define DELTA_AG9032V1_GPIO_FAN4_ABSENT					 1
+#define DELTA_AG9032V1_GPIO_FAN3_ABSENT					 2
+#define DELTA_AG9032V1_GPIO_FAN2_ABSENT					 3
+#define DELTA_AG9032V1_GPIO_FAN1_ABSENT					 4
+
+#endif	/* DELTA_AG9032V1_CPLD_H__ */

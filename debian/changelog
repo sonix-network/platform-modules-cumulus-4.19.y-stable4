@@ -1,0 +1,231 @@
+platform-modules (4.19-cl4.3.2u1) RELEASED; urgency=medium
+
+  * Updated version to 4.19-cl4.3.2u1
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Thu, 28 Sep 2023 06:39:08 -0700
+
+platform-modules (4.19-cl4.3.1u1) RELEASED; urgency=medium
+
+  * Updated version to 4.19-cl4.3.1u1
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Thu, 08 Sep 2022 16:21:42 -0700
+
+platform-modules (4.19-cl4.3.0u2) RELEASED; urgency=medium
+
+  * Closes CM-32215 Dell S5048f: Fix polarity for QSFP reset line
+  * Closes CM-31512 Celestica Questone and RedstoneV - fix SFP DOM display
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 15 Dec 2020 13:11:42 -0800
+
+platform-modules (4.0-cl4.2.1u1) RELEASED; urgency=medium
+
+  * Minor packaging version numbering change
+ 
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 08 Sep 2020 13:07:30 -0700
+
+platform-modules (4.0-cl4.2.1u1) RELEASED; urgency=medium
+
+  * Closes CM-30472: SFP+ ports do not work in Quanta LY4 (RMP) in 4.1.1
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 25 Aug 2020 13:57:59 -0700
+
+platform-modules (4.0+cl4u4) RELEASED; urgency=medium
+
+  * CL 4.2.0
+  * New Enabled: Support for DellEMC n3048ep, s5224f platforms
+  * New Enabled: Support for Accton AS4610-30P, AS5835-54X, AS5835-54T  platform
+  * New Enabled: Support for Delta AGV848v1 platform
+  * Minor platform bug fixes
+  * Closes CM-28862: Remove all jc42 instantiations from the platform drivers
+  * Closes CM-28250: On the AS7326 and AS7726 platforms, portwd is unable to probe 1000Base-T modules and cannot power down the module on admin down
+  * Closes CM-29468: Dell 4148T optical module low power polarity bit set incorrectly
+  * Closes CM-28376: On S5232F-ON, ledmgrd shows amber_blinking but smonctl shows all OK
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 02 Jun 2020 11:52:03 -0700
+
+platform-modules (4.0+cl4u3) RELEASED; urgency=medium
+
+  * Closes CM-29468: Dell S41xx: Fix polarity of lpmode bit
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Mon, 11 May 2020 13:37:04 -0700
+
+platform-modules (4.0+cl4u2) RELEASED; urgency=medium
+
+  * New Enabled: Support for DellEMC 3248PXE-ON, s5048f, s5212f platforms
+  * New Enabled: Support for Quannta ly4, ly6, ly7, ly8, ly9 platforms
+  * New Enabled: Support for Celestica Smallstone XP, Smallstone XP B, Questone 2, e1031 platforms
+  * New Enabled: Support for Delta ag9032v1, ag9032v2 platforms
+  * New Enabled: Support for Lenovo NE2580O platform
+  * New Enabled: Support for CX 1G 48 port switch (Edgecore AS4610) with single power supply
+  * Minor platform bug fixes
+  * Closes CM-28371: Lenovo NE0152T PSU2 always show ABSENT in smonctl
+  * Closes CM-26556: Quanta IX7: GPIO pin allocation requests fails with EPROBE_DEFER (error code -517) errors
+  * Closes CM-27096: I2C implementation difference on Edgecore 6712/6812 compare to 5712/5812
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Wed, 04 Mar 2020 00:54:22 +0000
+
+platform-modules (4.0+cl4u1) RELEASED; urgency=medium
+  * First Cumulus Linux 4 version
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 15 Oct 2019 15:10:21 -0700
+
+platform-modules (1+cl3u24) RELEASED; urgency=medium
+  * New platform support for DellEMC 5224F
+  * Minor platform bug fixes
+  * Closes CM-26556: Fixed IX7 GPIO definitions affecting operation
+  * Closes CM-27096: I2C improvements on Accton 6712
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 22 Nov 2019 12:52:50 -0800
+
+platform-modules (1+cl3u23) RELEASED; urgency=medium
+  * New platform support for DellEMC 5296
+  * New Enabled: support for DellEMC N3248PXE
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Sun, 01 Sep 2019 08:43:03 -0700
+
+platform-modules (1+cl3u22) RELEASED; urgency=medium
+  * New platform support
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 25 Jun 2019 13:14:52 -0700
+
+platform-modules (1+cl3u21) RELEASED; urgency=medium
+  * Closes CM-24387: add support for 48v PSU on Dell Z9100
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 19 Apr 2019 12:36:20 -0700
+
+platform-modules (1+cl3u20) RELEASED; urgency=medium
+  * Bug fixes for various platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 08 Mar 2019 09:51:17 -0800
+
+platform-modules (1+cl3u19) RELEASED; urgency=medium
+  * Closes CM-23409: fix QSFP EEPROM reads on some platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Thu, 24 Jan 2019 15:31:18 -0800
+
+platform-modules (1+cl3u18) RELEASED; urgency=medium
+  * New Enabled: Initial support for ag9032v2 platform
+  * New Enabled: Initial support for Lenovo NE0152T platform
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Wed, 31 Oct 2018 22:04:16 -0700
+
+platform-modules (1+cl3u17) RELEASED; urgency=medium
+  * bug fixes
+  * New Enabled: Support for some Lenovo platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Mon, 01 Oct 2018 13:18:11 -0700
+
+platform-modules (1+cl3u16) RELEASED; urgency=medium
+  * bug fixes for Trident 3 platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 14 Sep 2018 16:26:24 -0700
+
+platform-modules (1+cl3u15) RELEASED; urgency=medium
+  * Support for Trident3 platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Wed, 25 Jul 2018 16:56:54 -0700
+
+platform-modules (1+cl3u14) RELEASED; urgency=medium
+  * Minor bug fixes
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 06 Jul 2018 23:58:50 -0700
+
+platform-modules (1+cl3u13) RELEASED; urgency=medium
+  * New: Enabled Edgecore 7312, Dell S4128T, Dell S5048F
+  * Early Access support for Voyager
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 15 May 2018 21:23:06 -0700
+
+platform-modules (1+cl3u12) RELEASED; urgency=medium
+  * Fixed Celestica Pebble BMC port 50 SFP Module access
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 15 Dec 2017 11:28:56 -0800
+
+platform-modules (1+cl3u11) RELEASED; urgency=medium
+
+  * New: Enabled Delta AG7648, Quanta LY7, Celestica Redstone XP B (BMC),
+    Celestica Redstone-V, Celestica Pebble B (BMC)
+  * Closes: CM-19181: Dell 4148 and 4128 active cable tx_enable fix
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 12 Dec 2017 10:31:16 -0800
+
+platform-modules (1+cl3u10) RELEASED; urgency=medium
+
+  * Closes: CM-14896 - Add support for the Model 3Y power supply for some
+    Edgecore and HP platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Wed, 25 Oct 2017 09:41:11 -0700
+
+platform-modules (1+cl3u9) RELEASED; urgency=medium
+
+  * Fix OMP800 management network by resetting internal ethernet
+  * Closes: CM-14896 - Add support for the Model 3Y power supply for some
+    Edgecore and HP platforms
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Mon, 02 Oct 2017 18:21:16 -0700
+
+platform-modules (1+cl3u8) RELEASED; urgency=medium
+
+  * New: Enabled - Support for Delta AG9032, Dell S4148, S4148T, and S4128
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 15 Sep 2017 13:34:24 -0700
+
+platform-modules (1+cl3u7) RELEASED; urgency=medium
+
+  * New. Enabled. vhwmon: several fixes
+  * New. Enabled. Initial support for the Dell S4148
+  * New. Enabled. Initial support for qct-ly4r
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 04 Aug 2017 11:49:05 -0700
+
+platform-modules (1+cl3u6) RELEASED; urgency=medium
+
+  * New. Enabled: Added Platform support for Accton OMP800 Chassis
+  * New. Enabled: Added Platform support for Accton Wedge100 Chassis
+  * New. Enabled: Added Platform support for Celestica BigStone-G Chassis
+  * New. Enabled: Added Platform support for Facebook Backpack Chassis
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Mon, 17 Apr 2017 10:48:15 -0700
+
+platform-modules (1+cl3u5) RELEASED; urgency=medium
+
+  * New. Enabled: Additional Platform support for Quanta IX1 and IX2
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Sun, 22 Jan 2016 14:17:12 -0700
+
+platform-modules (1+cl3u4) RELEASED; urgency=medium
+
+  * New. Enabled: Added Platform Driver and CPLD driver for Accton AS7412_32X
+  * Closes: CM-12669 Expose PMBUS access for Dell S3000 PSUs
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Fri, 18 Nov 2016 10:49:12 -0700
+
+platform-modules (1+cl3u3) RELEASED; urgency=medium
+
+  * New. Enabled: Added Platform Driver and CPLD driver for DNI AG9032V1
+  * Closes: CM-12588 Dell S6000 shows invalid SFF idenitifier on eeprom reads
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Tue, 18 Oct 2016 11:50:08 -0700
+
+platform-modules (1+cl3u2) RELEASED; urgency=medium
+
+  * New. Enabled: Added Platform Driver and CPLD driver for Accton AS7712
+  * New. Enabled: Added Platform Driver and CPLD driver for Dell S6010
+  * New. Enabled: Added Platform Driver and CPLD driver for Quanta IX1
+  * New. Enabled: Added Platform Driver and CPLD driver for Quanta IX2
+  * New. Enabled: Added Platform Driver and CPLD driver for Facebook Wedge100
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Thu, 11 Aug 2016 11:20:04 -0700
+
+platform-modules (1+cl3u1) RELEASED; urgency=medium
+
+  * New. Enabled: Added CPLD driver for DNI-3048UP
+  * New. Enabled: Added Platform and CPLD driver for Cumulus VX
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Mon, 02 May 2016 16:45:04 -0700
+
+platform-modules (3.0) unstable; urgency=low
+
+  * Initial release (Closes: CM-8520)
+
+ -- dev-support <dev-support@cumulusnetworks.com>  Wed, 16 Sep 2015 11:15:45 -0700

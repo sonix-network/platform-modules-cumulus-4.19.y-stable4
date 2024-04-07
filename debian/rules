@@ -1,0 +1,143 @@
+#!/usr/bin/make -f
+SHELL := sh -e
+
+# Do no print "Entering directory ..."
+MAKEFLAGS += --no-print-directory
+
+GENCONTROL = debian/bin/gencontrol.py
+
+DEB_HOST_ARCH  := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+VERSION := $(shell dpkg-parsechangelog | sed -ne 's,^Version: *\(.*\)$$,\1,p')
+VERSION_UPSTREAM := $(shell echo "$(VERSION)" | sed -e 's,-[^-]*$$,,')
+VERSION_BINNMU := $(shell echo "$(VERSION)" | sed -ne 's,.*+b\(.*\)$$,\1,p')
+
+include debian/rules.defs
+
+ROOTCOMMAND = fakeroot
+ifeq ("$(origin ROOTCMD)", "command line")
+  ROOTCOMMAND = $(ROOTCMD)
+endif
+
+ifeq (,$(strip $(DEBARCH)))
+  DEBARCH := $(shell dpkg --print-architecture)
+endif
+
+ifeq (,$(strip $(FEATSET)))
+  FEATSET := none
+endif
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  DEBIAN_KERNEL_JOBS := $(subst parallel=,,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+ifdef DEBIAN_KERNEL_JOBS
+  MAKEFLAGS += -j$(DEBIAN_KERNEL_JOBS)
+endif
+
+.DEFAULT_GOAL := help
+
+.NOTPARALLEL:
+
+help:
+	@echo ''
+	@echo 'Cumulus Build System Targets'
+	@echo ''
+	@echo 'These targets can be executed by running "make -f debian/rules <tgt>"'
+	@echo ''
+	@echo 'Cumulus Targets (all users):'
+	@echo '  cl-easy-button  - patch validation target before patch submission.'
+	@echo '                    If you build with this target before submitting'
+	@echo '                    your patches you can be confident that your patches'
+	@echo '                    will build correctly when applied by the kernel'
+	@echo '                    maintainers.'
+	@echo '                    This target accepts a few options, all of these'
+	@echo '                    are optional and sane defaults will be chosen:'
+	@echo '                        ROOTCMD - cmd to gain root privs, default fakeroot'
+	@echo '                        DEBARCH - arch to build, default: host arch'
+	@echo '                           assumes system configured for cross-compilation'
+	@echo '                           if different than host arch, no check to'
+	@echo '                           verify this assumption is done'
+	@echo '                        FEATSET - kernel feature, default: none'
+	@echo '                        FLAVOR  - kernel flavor, default: no default'
+	@echo '  debian/control  - generate package control file based off configuration'
+	@echo '                    contained in linux-support-$(KERNELVERSION) package.'
+	@echo '                    NOTE: this target is mentioned because one may need'
+	@echo '                    to run it before dpkg-checkbuilddeps will work,'
+	@echo '                    so that one may install any missing build packages.'
+
+
+build: build-arch build-indep
+
+build-arch: debian/control
+	dh_testdir
+	$(MAKE) -f debian/rules.gen build-arch_$(DEB_HOST_ARCH)
+
+build-indep:
+
+binary:	binary-indep binary-arch
+
+binary-indep: debian/control $(BUILD_DIR)
+
+binary-arch: debian/control $(BUILD_DIR)
+	dh_testdir
+	$(MAKE) -f debian/rules.gen binary-arch_$(DEB_HOST_ARCH)
+
+ifdef DEBIAN_KERNEL_BUILD_ANY
+binary-arch: binary-arch-all
+endif
+
+binary-arch-all: debian/control $(BUILD_DIR)
+	dh_testdir
+	$(MAKE) -f debian/rules.gen binary-arch
+
+$(BUILD_DIR):
+	@[ -d $@ ] || mkdir $@
+
+clean: debian/control
+	dh_testdir
+	rm -rf $(BUILD_DIR) $(STAMPS_DIR)
+	dh_clean
+	find debian -maxdepth 1 -type l -delete
+
+maintainerclean: clean
+	rm -f debian/control debian/control.md5sum debian/rules.gen debian/*.bug-presubj debian/*.lintian-overrides
+# dh_clean won't deal with binary packages that no longer exist after
+# removal of a flavour.
+	rm -rf $(filter-out %.config %.postinst %.templates %.NEWS, $(wildcard debian/linux-*))
+
+CONTROL_FILES += debian/changelog $(wildcard debian/templates/control.*)
+debian/control debian/rules.gen: $(GENCONTROL) $(CONTROL_FILES)
+ifeq ($(wildcard debian/control.md5sum),)
+	$(MAKE) -f debian/rules debian/control-real
+else ifeq ($(VERSION_BINNMU),)
+	md5sum --check debian/control.md5sum --status || \
+		$(MAKE) -f debian/rules debian/control-real
+else
+	grep -v debian/changelog debian/control.md5sum | md5sum --check - --status || \
+		$(MAKE) -f debian/rules debian/control-real
+endif
+
+debian/control-real: $(GENCONTROL) $(CONTROL_FILES)
+	@( $(GENCONTROL) $(if $(KSRC),$(KSRC)/debian,/usr/src/linux-support-$(KERNELVERSION)) || { \
+		echo ""; \
+		echo "Error: either install linux-support-$(KERNELVERSION) package"; \
+		echo "       -or-"; \
+		echo "       set KSRC=<kernel devel tree> on command line"; \
+		echo "Note: if you use KSRC you must have run cl-easy-button"; \
+		echo "      in the kernel tree first"; \
+		echo ""; \
+		exit 2; } )
+	md5sum $^ > debian/control.md5sum
+	@echo
+	@echo This target is made to fail intentionally, to make sure
+	@echo that it is NEVER run during the automated build. Please
+	@echo ignore the following error, the debian/control file has
+	@echo been generated SUCCESSFULLY.
+	@echo
+	exit 1
+
+cl-easy-button:
+	-$(MAKE) -f debian/rules debian/control
+	$(Q)$(ROOTCOMMAND) $(MAKE) -f debian/rules.gen binary-arch_$(DEBARCH)_$(FEATSET)$(if $(FLAVOR),_$(FLAVOR))
+
+.PHONY: clean build binary-indep binary-arch binary cl-easy-button
